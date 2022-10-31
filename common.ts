@@ -3,6 +3,17 @@ export type Coordinate = {
     y: number;
   };
 
+export const changeCoordinate = (c: Coordinate, byX: number, byY: number): Coordinate => {
+    return {
+        x: c.x + byX, 
+        y: c.y + byY
+    }
+}
+
+export const transformCoordinate = (c: Coordinate, transformations: number[][]): Coordinate[] => {
+    return transformations.map(t => changeCoordinate(c, t[0], t[1]))
+}
+
 export const range = (min: number, max: number) => [...Array(max - min).keys()].map(n => n+ min)
 
 export const extractCaptureGroups = (pattern: RegExp, str: string, numberOfGroups: number): string[] => {
