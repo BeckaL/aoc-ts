@@ -34,7 +34,8 @@ const parseLine = (line: string, rowNumber: number): [string, CarData[]] => {
 };
 
 const orderCars = (cars: CarData[]): CarData[] => {
-  return cars.sort((firstCar, secondCar) => {
+  const copy = [...cars]
+  return copy.sort((firstCar, secondCar) => {
     return firstCar.position.y - secondCar.position.y ||
       firstCar.position.x - secondCar.position.x;
   });
@@ -111,17 +112,17 @@ const tick = (orderedCars: CarData[], track: string[], newCarData: CarData[] = [
     }
 }
 
-const tickPartTwo = (orderedCars: CarData[], track: string[], newCarData: CarData[] = []): Coordinate | CarData[] => {
+const tickPartTwo = (orderedCars: CarData[], track: string[], newCarData: CarData[] = []): CarData[] => {
     const next = orderedCars.shift() 
-    if (orderedCars.length === 0) {
-        return next?.position as Coordinate
-    }  else {
+    if (next === undefined) {
+        return newCarData
+    } else {
         const moved = moveCar(next as CarData, track)
         const inNewCarData = newCarData.find(car => car.position.x === moved.position.x && car.position.y === moved.position.y)
         const inExistingCarData = orderedCars.find(car => car.position.x === moved.position.x && car.position.y === moved.position.y)
         if (inNewCarData === undefined && inExistingCarData === undefined) {
             newCarData.push(moved)
-            return tick(orderedCars, track, newCarData)
+            return tickPartTwo(orderedCars, track, newCarData)
         } else {
             const newCarDataWithoutCrashed = newCarData.filter(car => car.position.x != moved.position.x || car.position.y != moved.position.y)
             const existingCarDataWithoutCrashed = orderedCars.filter(car => car.position.x != moved.position.x || car.position.y != moved.position.y)
@@ -141,13 +142,13 @@ const go = (cars: CarData[], track: string[]): Coordinate => {
 }
 
 const goPartTwo = (cars: CarData[], track: string[]): Coordinate => {
-    const ordered = orderCars(cars)
-    const crashCoordOrNewCars = tickPartTwo(ordered, track)
-    if ("x" in crashCoordOrNewCars) {
-        return crashCoordOrNewCars
-    } else {
-        return go(crashCoordOrNewCars, track)
+    let ordered = orderCars(cars)
+    let newCars = ordered
+    while (newCars.length != 1) {
+        ordered = orderCars(newCars)
+        newCars = tickPartTwo(ordered, track)
     }
+    return newCars[0].position
 }
 
 const lines = Deno.readTextFileSync("2018/input/day_13_input.txt").split(

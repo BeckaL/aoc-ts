@@ -26,3 +26,20 @@ export const extractCaptureGroups = (pattern: RegExp, str: string, numberOfGroup
         return match.slice(1)
       }
 }
+
+export enum Direction {
+    North,
+    East,
+    South,
+    West
+  }
+
+  const directions = [Direction.North, Direction.East, Direction.South, Direction.West]
+
+  export const turnRight = (currentDirection: Direction): Direction => {
+    return directions[(directions.indexOf(currentDirection) + 1) % 4]
+  }
+
+  export const turnLeft = (currentDirection: Direction): Direction => {
+    return directions[(directions.indexOf(currentDirection) - 1 + 4) % 4]
+  }
